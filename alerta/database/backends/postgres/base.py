@@ -1336,8 +1336,8 @@ class Backend(Database):
         )
         SELECT id, event, last_receive_id
           FROM shelved
-         WHERE timeout!=0 AND (update_time + INTERVAL '1 second' * timeout) < NOW() at time zone 'utc'
-        """
+         WHERE {timeout}!=0 AND (update_time + INTERVAL '1 second' * timeout) < NOW() at time zone 'utc'
+        """.format(timeout=current_app.config['SHELVE_TIMEOUT'])
         unshelve = self._fetchall(select, {})
 
         # get list of alerts to be unack'ed
@@ -1352,8 +1352,8 @@ class Backend(Database):
         )
         SELECT id, event, last_receive_id
           FROM acked
-         WHERE timeout!=0 AND (update_time + INTERVAL '1 second' * timeout) < NOW() at time zone 'utc'
-        """
+         WHERE {timeout}!=0 AND (update_time + INTERVAL '1 second' * timeout) < NOW() at time zone 'utc'
+        """.format(timeout=current_app.config['ACK_TIMEOUT'])
         unack = self._fetchall(select, {})
 
         return has_expired, unshelve + unack
